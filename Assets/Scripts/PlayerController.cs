@@ -5,6 +5,7 @@ public class PlayerController : MonoBehaviour
 {
     [SerializeField] private UserInputSystem inputSystem;
     [SerializeField] private float moveSpeed = 5f;
+    [SerializeField] private Animator _animator;
 
     private Rigidbody rb;
     private IAbility shootAbility;
@@ -30,16 +31,29 @@ public class PlayerController : MonoBehaviour
     private void HandleMovement()
     {
         Vector2 moveInput = inputSystem.CurrentInput.Move;
-        Vector3 moveDir = new Vector3(moveInput.x, 0, moveInput.y);
 
-        if (moveDir.magnitude > 0.1f)
+        Vector3 moveDir = new Vector3(moveInput.x, 0, moveInput.y);
+        float magnitude = moveInput.magnitude;
+
+        if (magnitude > 0.1f)
         {
-            rb.velocity = new Vector3(moveDir.x * moveSpeed, rb.velocity.y, moveDir.z * moveSpeed);
+            if (_animator != null)
+            {
+                _animator.SetFloat("Speed", magnitude);
+            }
+
+            rb.velocity = moveDir * moveSpeed;
+
             transform.forward = moveDir;
         }
         else
         {
-            rb.velocity = new Vector3(0, rb.velocity.y, 0);
+            if (_animator != null)
+            {
+                _animator.SetFloat("Speed", 0f);
+            }
+
+            rb.velocity = Vector3.zero;
         }
     }
 
@@ -49,5 +63,26 @@ public class PlayerController : MonoBehaviour
         if (inputSystem.CurrentInput.IsDashPressed) dashAbility?.Execute();
 
         inputSystem.ResetTriggers();
+    }
+
+    public void TakeDamage()
+    {
+        _animator.SetTrigger("TakeDamage");
+    }
+
+    public void Die()
+    {
+        if (_animator != null)
+        {
+            _animator.SetTrigger("Die");
+        }
+
+        this.enabled = false;
+
+        if (rb != null)
+        {
+            rb.velocity = Vector3.zero;
+            rb.isKinematic = true; 
+        }
     }
 }
