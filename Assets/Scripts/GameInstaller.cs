@@ -4,23 +4,22 @@ using Zenject;
 public class GameInstaller : MonoInstaller
 {
     [SerializeField] private bool _useDummyConfig;
-    [SerializeField] private ScriptableGameConfig _scriptableConfig;
 
     public override void InstallBindings()
     {
         if (_useDummyConfig)
         {
             Container.Bind<IGameConfig>().To<DummyConfig>().AsSingle();
-            Debug.Log("<color=yellow>DI: Используется Dummy конфигурация</color>");
+
+            Container.Bind<PlayerConfig>().AsSingle().NonLazy();
+
+            Debug.Log("<color=yellow>DI: Для игры используется Dummy конфигурация. Облачный конфиг скачается в фоновом режиме.</color>");
         }
         else
         {
-            Container.Bind<IGameConfig>()
-                .To<RemoteConfigLoader>()
-                .AsSingle()
-                .WithArguments(_scriptableConfig);
+            Container.BindInterfacesAndSelfTo<PlayerConfig>().AsSingle().NonLazy();
 
-            Debug.Log("<color=green>DI: Используется конфигурация из Scriptable Object</color>");
+            Debug.Log("<color=green>DI: Для игры используется асинхронная конфигурация (JSON)</color>");
         }
     }
 }

@@ -11,6 +11,12 @@ public class PlayerController : MonoBehaviour
     private IAbility shootAbility;
     private IAbility dashAbility;
 
+    public float MoveSpeed
+    {
+        get => moveSpeed;
+        set => moveSpeed = value;
+    }
+
     private void Awake()
     {
         rb = GetComponent<Rigidbody>();
@@ -67,7 +73,10 @@ public class PlayerController : MonoBehaviour
 
     public void TakeDamage()
     {
-        _animator.SetTrigger("TakeDamage");
+        if (_animator != null)
+        {
+            _animator.SetTrigger("TakeDamage");
+        }
     }
 
     public void Die()
@@ -82,7 +91,7 @@ public class PlayerController : MonoBehaviour
         if (rb != null)
         {
             rb.velocity = Vector3.zero;
-            rb.isKinematic = true; 
+            rb.isKinematic = true;
         }
     }
 }
